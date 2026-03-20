@@ -16,7 +16,7 @@ Assist
 
 Middle-click `Assist` in Acme to launch.
 
-**Namespaces:** Connect to different anvilsrv instances via `$NAMESPACE`:
+**Namespaces:** Connect to different anvillm instances via `$NAMESPACE`:
 ```sh
 NAMESPACE=/tmp/ns.$USER.:1 Assist
 ```
@@ -35,5 +35,5 @@ NAMESPACE=/tmp/ns.$USER.:1 Assist
 ## Dependencies
 
 - Acme editor (Plan 9 from User Space)
-- anvilsrv (session daemon)
+- anvillm (session daemon)
 - 9beads (optional, for task tracking)

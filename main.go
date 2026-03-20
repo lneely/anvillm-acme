@@ -69,15 +69,15 @@ func main() {
 
 	flag.Parse()
 
-	// Connect to anvilsrv via 9P, auto-starting if needed
+	// Connect to anvillm via 9P, auto-starting if needed
 	var err error
 	fs, err = connectToServer()
 	if err != nil {
-		// Try to start anvilsrv automatically
-		logging.Logger().Info("anvilsrv not running, attempting to start")
-		startCmd := exec.Command("anvilsrv", "start")
+		// Try to start anvillm automatically
+		logging.Logger().Info("anvillm not running, attempting to start")
+		startCmd := exec.Command("anvillm", "start")
 		if err := startCmd.Run(); err != nil {
-			logging.Logger().Error("failed to start anvilsrv", zap.Error(err))
+			logging.Logger().Error("failed to start anvillm", zap.Error(err))
 			logging.Logger().Info("continuing without daemon connection")
 		} else {
 			// Wait a moment for daemon to initialize
@@ -90,7 +90,7 @@ func main() {
 			}
 
 			if err != nil {
-				logging.Logger().Error("failed to connect to anvilsrv after starting", zap.Error(err))
+				logging.Logger().Error("failed to connect to anvillm after starting", zap.Error(err))
 				logging.Logger().Info("continuing without daemon connection")
 			}
 		}
@@ -361,7 +361,7 @@ func isConnected() bool {
 
 func createSession(backend, cwd string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv (use Daemon command to start server)")
+		return fmt.Errorf("not connected to anvillm (use Daemon command to start server)")
 	}
 	// Validate and clean the path
 	cleanPath := filepath.Clean(cwd)
@@ -395,7 +395,7 @@ func createSession(backend, cwd string) error {
 
 func controlSession(id, cmd string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 	path := filepath.Join(id, "ctl")
 	fid, err := fs.Open(path, plan9.OWRITE)
@@ -410,7 +410,7 @@ func controlSession(id, cmd string) error {
 
 func sendPrompt(id, prompt string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 
 	// Create message JSON
@@ -443,7 +443,7 @@ func sendPrompt(id, prompt string) error {
 
 func setAlias(id, alias string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 	path := filepath.Join(id, "alias")
 	fid, err := fs.Open(path, plan9.OWRITE)
@@ -490,7 +490,7 @@ func getSession(id string) (*SessionInfo, error) {
 
 func listSessions() ([]*SessionInfo, error) {
 	if !isConnected() {
-		return nil, fmt.Errorf("not connected to anvilsrv")
+		return nil, fmt.Errorf("not connected to anvillm")
 	}
 	data, err := readFile("list")
 	if err != nil {
@@ -534,7 +534,7 @@ func listSessions() ([]*SessionInfo, error) {
 
 func readFile(path string) ([]byte, error) {
 	if !isConnected() {
-		return nil, fmt.Errorf("not connected to anvilsrv")
+		return nil, fmt.Errorf("not connected to anvillm")
 	}
 	fid, err := fs.Open(path, plan9.OREAD)
 	if err != nil {
@@ -558,7 +558,7 @@ func readFile(path string) ([]byte, error) {
 
 func writeFile(path string, data []byte) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 	fid, err := fs.Open(path, plan9.OWRITE)
 	if err != nil {
@@ -575,7 +575,7 @@ func refreshList(w *acme.Win) {
 	buf.WriteString("Backends: [Kiro] [Claude] [Ollama]\n\n")
 
 	if !isConnected() {
-		buf.WriteString("Not connected to anvilsrv daemon.\n")
+		buf.WriteString("Not connected to anvillm daemon.\n")
 		buf.WriteString("Use 'Daemon' command to start the server.\n")
 		w.Addr(",")
 		w.Write("data", []byte(buf.String()))
@@ -624,7 +624,7 @@ func refreshList(w *acme.Win) {
 
 func recoverSessions(w *acme.Win) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 	if err := writeFile("ctl", []byte("recover")); err != nil {
 		return err
@@ -1014,7 +1014,7 @@ func refreshDaemonWindow(w *acme.Win) {
 	buf.WriteString(strings.Repeat("=", 60) + "\n\n")
 
 	// Check daemon status
-	statusCmd := exec.Command("anvilsrv", "status")
+	statusCmd := exec.Command("anvillm", "status")
 	output, err := statusCmd.CombinedOutput()
 
 	if err != nil {
@@ -1052,12 +1052,12 @@ func refreshDaemonWindow(w *acme.Win) {
 	buf.WriteString("\n")
 	buf.WriteString(strings.Repeat("-", 60) + "\n")
 	buf.WriteString("Commands:\n")
-	buf.WriteString("  Start   - Start the daemon (anvilsrv start)\n")
-	buf.WriteString("  Stop    - Stop the daemon (anvilsrv stop)\n")
+	buf.WriteString("  Start   - Start the daemon (anvillm start)\n")
+	buf.WriteString("  Stop    - Stop the daemon (anvillm stop)\n")
 	buf.WriteString("  Restart - Restart the daemon\n")
 	buf.WriteString("  Get     - Refresh this window\n\n")
 
-	buf.WriteString("Note: Use 'anvilsrv fgstart' in terminal for debug logs.\n")
+	buf.WriteString("Note: Use 'anvillm fgstart' in terminal for debug logs.\n")
 
 	w.Addr(",")
 	w.Write("data", []byte(buf.String()))
@@ -1071,7 +1071,7 @@ func startDaemon(w *acme.Win) {
 	w.Addr("$")
 	w.Write("data", []byte("\nStarting daemon...\n"))
 
-	cmd := exec.Command("anvilsrv", "start")
+	cmd := exec.Command("anvillm", "start")
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
@@ -1098,7 +1098,7 @@ func stopDaemon(w *acme.Win) {
 	w.Addr("$")
 	w.Write("data", []byte("\nStopping daemon...\n"))
 
-	cmd := exec.Command("anvilsrv", "stop")
+	cmd := exec.Command("anvillm", "stop")
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
@@ -1520,7 +1520,7 @@ func listArchiveMessages() ([]Message, []string, error) {
 
 func listMessages(folder string) ([]Message, []string, error) {
 	if !isConnected() {
-		return nil, nil, fmt.Errorf("not connected to anvilsrv")
+		return nil, nil, fmt.Errorf("not connected to anvillm")
 	}
 
 	fid, err := fs.Open(folder, plan9.OREAD)
@@ -1819,7 +1819,7 @@ func refreshInboxWindowByName() {
 
 func archiveMessage(msgID string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 
 	fid, err := fs.Open("user/ctl", plan9.OWRITE)
@@ -1836,7 +1836,7 @@ func archiveMessage(msgID string) error {
 // deleteArchivedMessage permanently removes a message from the completed/archive folder.
 func deleteArchivedMessage(msgID string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 
 	fid, err := fs.Open("user/ctl", plan9.OWRITE)
@@ -1853,7 +1853,7 @@ func deleteArchivedMessage(msgID string) error {
 // deleteInboxMessage removes a message from the inbox without archiving.
 func deleteInboxMessage(msgID string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 
 	fid, err := fs.Open("user/ctl", plan9.OWRITE)
@@ -1937,7 +1937,7 @@ func handleReplyWindow(w *acme.Win, to, msgType, subject, originalMsgID string) 
 
 func sendReply(to, msgType, subject, body string) error {
 	if !isConnected() {
-		return fmt.Errorf("not connected to anvilsrv")
+		return fmt.Errorf("not connected to anvillm")
 	}
 
 	msg := map[string]interface{}{
