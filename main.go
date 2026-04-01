@@ -172,7 +172,7 @@ func main() {
 					continue
 				}
 				refreshList(w)
-			case "Ollama":
+			case "Ollie":
 				if err := createSession("ollie", arg); err != nil {
 					fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 					continue
@@ -329,7 +329,7 @@ func main() {
 // parseCommand extracts command and argument from input text
 // Handles cases like "Kiro /path" -> ("Kiro", "/path")
 func parseCommand(cmd, arg string) (string, string) {
-	commandsWithArgs := []string{"Kiro", "Claude", "Ollama", "Stop", "Restart", "Kill", "Alias", "Context"}
+	commandsWithArgs := []string{"Kiro", "Claude", "Ollie", "Stop", "Restart", "Kill", "Alias", "Context"}
 
 	for _, cmdName := range commandsWithArgs {
 		prefix := cmdName + " "
@@ -568,7 +568,7 @@ func writeFile(path string, data []byte) error {
 
 func refreshList(w *acme.Win) {
 	var buf strings.Builder
-	buf.WriteString("Backends: [Kiro] [Claude] [Ollama]\n\n")
+	buf.WriteString("Backends: [Kiro] [Claude] [Ollie]\n\n")
 
 	if !isConnected() {
 		buf.WriteString("Not connected to anvillm daemon.\n")
