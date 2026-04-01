@@ -173,11 +173,7 @@ func main() {
 				}
 				refreshList(w)
 			case "Ollama":
-				if arg == "" {
-					fmt.Fprintf(os.Stderr, "Error: Ollama requires a path argument\n")
-					continue
-				}
-				if err := createSession("ollama", arg); err != nil {
+				if err := createSession("ollie", arg); err != nil {
 					fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 					continue
 				}
@@ -648,13 +644,13 @@ type sessionEdit struct {
 //	- <id>                    Kill the session with that ID
 //	~ <id>                    Stop the session (graceful)
 //	@ <id> <alias>            Set alias on the session
-//	+ <backend> <path> [alias]  Start a new session (backends: claude, kiro-cli, ollama)
+//	+ <backend> <path> [alias]  Start a new session (backends: claude, kiro-cli, ollie)
 func parseSessionEdits(content string) []sessionEdit {
 	var edits []sessionEdit
 	validBackends := map[string]bool{
 		"claude":   true,
 		"kiro-cli": true,
-		"ollama":   true,
+		"ollie":   true,
 	}
 	for _, line := range strings.Split(content, "\n") {
 		line = strings.TrimSpace(line)
